@@ -46,14 +46,14 @@ conda activate sentieon-cli-1.5.2
 #     --threads 16
 
 # sentieon 1.2 model bundleL
-aardvark compare \
-    --reference support_files/hg38_ucsc.fa \
-    --truth-vcf truthsets/HG002_GRCh38_v5.0q_smvar.vcf.gz \
-    --query-vcf Sentieon_output/HG002_pangenome_2.1graph_1.2model.filtered.vcf.gz \
-    --regions truthsets/HG002_GRCh38_v5.0q_smvar.benchmark.bed \
-    --output-dir aardvark_results/sentieon_2.1graph_1.2model_filtered \
-    --stratification support_files/GRCh38@all/GRCh38-all-stratifications.tsv \
-    --threads 16
+# aardvark compare \
+#     --reference support_files/hg38_ucsc.fa \
+#     --truth-vcf truthsets/HG002_GRCh38_v5.0q_smvar.vcf.gz \
+#     --query-vcf Sentieon_output/HG002_pangenome_2.1graph_1.2model.filtered.vcf.gz \
+#     --regions truthsets/HG002_GRCh38_v5.0q_smvar.benchmark.bed \
+#     --output-dir aardvark_results/sentieon_2.1graph_1.2model_filtered \
+#     --stratification support_files/GRCh38@all/GRCh38-all-stratifications.tsv \
+#     --threads 16
 
 
 # Pangenome DV to truth set
@@ -86,6 +86,15 @@ aardvark compare \
 #     --stratification /private/groups/patenlab/yulia/sentieon_benchmarking/support_files/GRCh38@all/GRCh38-all-stratifications.tsv \
 #     --threads 16
 
+#Pangenome DV + 16haplotype model, filtered with bcftools view -f "PASS,." to truth set, Sentieon BA file
+# aardvark compare \
+#     --reference support_files/hg38_ucsc.fa \
+#     --truth-vcf truthsets/HG002_GRCh38_v5.0q_smvar.vcf.gz \
+#     --query-vcf vg_output_pangenome/sentieonbam/HG002_eval.sentieonbam.filtered.vcf.gz \
+#     --regions truthsets/HG002_GRCh38_v5.0q_smvar.benchmark.bed \
+#     --output-dir aardvark_results/vg_pangenomeDV_16hapmodel_filtered_Sentieonbam \
+#     --stratification support_files/GRCh38@all/GRCh38-all-stratifications.tsv \
+#     --threads 16
 
 # sentieon 2 identical runs:
 # aardvark compare \
@@ -104,3 +113,61 @@ aardvark compare \
 #     --regions /private/groups/patenlab/yulia/sentieon_benchmarking/support_files/hg38_canonical.bed \
 #     --output-dir aardvark_results/sentieon2.0vs2.1 \
 #     --threads 16
+
+
+#BAM file from WDL (left shifted and abra2 realigned), Pangenome DV + 16haplotype model, filtered with bcftools view -f "PASS,." to truth set 
+#  aardvark compare \
+#     --reference support_files/hg38_ucsc.fa \
+#     --truth-vcf truthsets/HG002_GRCh38_v5.0q_smvar.vcf.gz \
+#     --query-vcf vg_output_pangenome/16hap_model_wdlbam/HG002_eval.output.pangenome.wdlbamvcf.filtered.gz \
+#     --regions truthsets/HG002_GRCh38_v5.0q_smvar.benchmark.bed \
+#     --output-dir aardvark_results/vg_pangenomeDV_16hapmodel_filtered_WDLBAM \
+#     --stratification support_files/GRCh38@all/GRCh38-all-stratifications.tsv \
+#     --threads 16
+
+#Sentieon 2.0 graph 1.2 model
+#  aardvark compare \
+#     --reference support_files/hg38_ucsc.fa \
+#     --truth-vcf truthsets/HG002_GRCh38_v5.0q_smvar.vcf.gz \
+#     --query-vcf Sentieon_output/HG002_2.0graph_1.2model/HG002_pangenome_2.0_evalgraph_1.2model.filtered.vcf.gz \
+#     --regions truthsets/HG002_GRCh38_v5.0q_smvar.benchmark.bed \
+#     --output-dir aardvark_results/sentieon2.0graph_1.2model \
+#     --stratification support_files/GRCh38@all/GRCh38-all-stratifications.tsv \
+#     --threads 16
+
+#Kishwar's vcg against truth set
+#  aardvark compare \
+#     --reference support_files/hg38_ucsc.fa \
+#     --truth-vcf truthsets/HG002_GRCh38_v5.0q_smvar.vcf.gz \
+#     --query-vcf Kishwar_vcf/hg002_wgs_dv/HG002-year2-hprc_v2.1-hap32-exp_dbg_HG002.deepvariant.filtered.vcf.gz \
+#     --regions truthsets/HG002_GRCh38_v5.0q_smvar.benchmark.bed \
+#     --output-dir aardvark_results/Kishwar_vcf \
+#     --stratification support_files/GRCh38@all/GRCh38-all-stratifications.tsv \
+#     --threads 16
+
+# HG003 Sentieon
+# bcftools view -f "PASS,." Sentieon_output/HG003_2.1graph_1.2model/HG003_pangenome_2.1graph_1.2model.vcf.gz -Oz -o Sentieon_output/HG003_2.1graph_1.2model/HG003_pangenome_2.1graph_1.2model.filtered.vcf.gz
+
+# bcftools index -t Sentieon_output/HG003_2.1graph_1.2model/HG003_pangenome_2.1graph_1.2model.filtered.vcf.gz
+
+#  aardvark compare \
+#     --reference support_files/hg38_ucsc.fa \
+#     --truth-vcf truthsets/HG003_GRCh38_1_22_v4.2.1_benchmark.vcf.gz \
+#     --query-vcf Sentieon_output/HG003_2.1graph_1.2model/HG003_pangenome_2.1graph_1.2model.filtered.vcf.gz \
+#     --regions truthsets/HG003_GRCh38_1_22_v4.2.1_benchmark_noinconsistent.bed \
+#     --output-dir aardvark_results/sentieon_HG003 \
+#     --stratification support_files/GRCh38@all/GRCh38-all-stratifications.tsv \
+#     --threads 16
+
+# HG003 DeepVariant
+bcftools view -f "PASS,." vg_output_pangenome/HG003/HG003_eval.output.pangenome.wdlbam.vcf.gz -Oz -o vg_output_pangenome/HG003/HG003_eval.output.pangenome.wdlbam.filtered.vcf.gz
+bcftools index -t vg_output_pangenome/HG003/HG003_eval.output.pangenome.wdlbam.filtered.vcf.gz
+
+ aardvark compare \
+    --reference support_files/hg38_ucsc.fa \
+    --truth-vcf truthsets/HG003_GRCh38_1_22_v4.2.1_benchmark.vcf.gz \
+    --query-vcf vg_output_pangenome/HG003/HG003_eval.output.pangenome.wdlbam.filtered.vcf.gz \
+    --regions truthsets/HG003_GRCh38_1_22_v4.2.1_benchmark_noinconsistent.bed \
+    --output-dir aardvark_results/DV_HG003 \
+    --stratification support_files/GRCh38@all/GRCh38-all-stratifications.tsv \
+    --threads 16

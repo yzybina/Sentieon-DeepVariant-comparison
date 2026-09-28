@@ -14,14 +14,9 @@ source /private/home/yzybina/miniconda3//etc/profile.d/conda.sh
 conda activate sentieon-cli-1.5.2
 
 
-# /private/home/yzybina/vg_1.74.1/vg autoindex \
-#     --workflow sampling \
-#     --prefix support_files/hprc-v2.0-mc-grch38-eval \
-#     -G /private/groups/cgl/hprc-graphs/hprc-v2.0-feb28/hprc-v2.0-mc-grch38-eval/hprc-v2.0-mc-grch38-eval.gbz \
-#     --threads 16
-
 /private/home/yzybina/vg_1.74.1/vg autoindex \
-    --workflow sampling \
-    --prefix support_files/hprc-v2.0-mc-grch38 \
-    -G /private/groups/cgl/hprc-graphs/hprc-v2.0-feb28/hprc-v2.0-mc-grch38/hprc-v2.0-mc-grch38.gbz \
+    --prefix vg_output_pangenome/HG002 \
+    --workflow giraffe \
+    --no-guessing \
+    -G vg_output_pangenome/HG002.gbz \
     --threads 16

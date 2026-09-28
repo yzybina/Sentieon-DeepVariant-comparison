@@ -21,65 +21,66 @@ export PATH=/private/home/yzybina/vg/bin:$PATH
 # Count kmers from reads
 #kmc: Counts 29-mers from your raw reads and stores them in a .kff file. 
 #This is the only step that touches the raw reads. Its output represents "what kmers are present in this sample."
-# kmc -k29 -okff -t16 \
-#     /private/groups/patenlab/anovak/projects/hprc/lr-giraffe/reads/real/illumina/HG002/HG002.novaseq.pcr-free.40x.full.fq.gz \
-#     vg_output/HG002 \
-#     vg_output/tmp
+kmc -k29 -okff -t16 \
+    /private/groups/patenlab/anovak/projects/hprc/lr-giraffe/reads/real/illumina/HG002/HG002.novaseq.pcr-free.40x.full.fq.gz \
+    vg_output/HG002 \
+    vg_output/tmp
 
 #Uses the kmer counts (.kff) as evidence of which haplotypes in the pangenome are consistent with your sample. Produces a reduced, sample-specific graph
 #when using the d46 filtered graph this step is not needed
-# /private/home/yzybina/vg_1.74.1/vg haplotypes -v 2 -t 16 \
-#     --include-reference \
-#     --diploid-sampling \
-#     -i /private/groups/cgl/hprc-graphs/hprc-v2.1-dec23/hprc-v2.1-mc-grch38-eval/hprc-v2.1-mc-grch38-eval.hapl \
-#     -k vg_output/HG002.kff \
-#     -g vg_output/HG002.gbz \
-#     /private/groups/cgl/hprc-graphs/hprc-v2.1-dec23/hprc-v2.1-mc-grch38-eval/hprc-v2.1-mc-grch38-eval.gbz
+#donwsample graph to 2 haplotypes
+/private/home/yzybina/vg_1.74.1/vg haplotypes -v 2 -t 16 \
+    --include-reference \
+    --diploid-sampling \
+    -i /private/groups/cgl/hprc-graphs/hprc-v2.1-dec23/hprc-v2.1-mc-grch38-eval/hprc-v2.1-mc-grch38-eval.hapl \
+    -k vg_output/HG002.kff \
+    -g vg_output/HG002.gbz \
+    /private/groups/cgl/hprc-graphs/hprc-v2.1-dec23/hprc-v2.1-mc-grch38-eval/hprc-v2.1-mc-grch38-eval.gbz
 
 #vg autoindex: Builds mapping indexes (distance index, minimizer index, zipcodes) from the sample-specific graph. No reads involved at all.
-# /private/home/yzybina/vg_1.74.1/vg autoindex \
-#     --prefix vg_output/HG002 \
-#     --workflow giraffe \
-#     --no-guessing \
-#     -G vg_output/HG002.gbz \
-#     --threads 16
+/private/home/yzybina/vg_1.74.1/vg autoindex \
+    --prefix vg_output/HG002 \
+    --workflow giraffe \
+    --no-guessing \
+    -G vg_output/HG002.gbz \
+    --threads 16
 
 
 #Maps the raw reads to the indexed sample-specific graph and produces a BAM
-# vg giraffe \
-#   -Z /private/groups/patenlab/yulia/sentieon_benchmarking/vg_output/HG002.gbz \
-#   -d /private/groups/patenlab/yulia/sentieon_benchmarking/vg_output/HG002.dist \
-#   -m /private/groups/patenlab/yulia/sentieon_benchmarking/vg_output/HG002.shortread.withzip.min \
-#   -z /private/groups/patenlab/yulia/sentieon_benchmarking/vg_output/HG002.shortread.zipcodes \
-#   -f /private/groups/patenlab/anovak/projects/hprc/lr-giraffe/reads/real/illumina/HG002/HG002.novaseq.pcr-free.40x.full.fq.gz \
-#   -i \
-#   -N HG002 \
-#   --ref-name GRCh38 \
-#   --threads 16 \
-#   --output-format BAM | \
-#   samtools sort -@ 4 -o vg_output/HG002_eval.aligned.sorted.bam
+vg giraffe \
+  -Z vg_output/HG002.gbz \
+  -d vg_output/HG002.dist \
+  -m vg_output/HG002.shortread.withzip.min \
+  -z vg_output/HG002.shortread.zipcodes \
+  -f /private/groups/patenlab/anovak/projects/hprc/lr-giraffe/reads/real/illumina/HG002/HG002.novaseq.pcr-free.40x.full.fq.gz \
+  -i \
+  -N HG002 \
+  --ref-name GRCh38 \
+  --threads 16 \
+  --output-format BAM | \
+  samtools sort -@ 4 -o vg_output/HG002_eval.aligned.sorted.bam
 
-#samtools index vg_output/HG002_eval.aligned.sorted.bam #Sorts and indexes the BAM so it can be randomly accessed by position, which DeepVariant requires.
+samtools index vg_output/HG002_eval.aligned.sorted.bam #Sorts and indexes the BAM so it can be randomly accessed by position, which DeepVariant requires.
 
-# samtools view -h vg_output/HG002_eval.aligned.sorted.bam | \
-#   sed -e "s/GRCh38#0#//g" | \
-#   samtools sort --threads 10 -m 2G -O BAM > vg_output/HG002_eval.aligned.sorted.renamed.bam
+samtools view -h vg_output/HG002_eval.aligned.sorted.bam | \
+  sed -e "s/GRCh38#0#//g" | \
+  samtools sort --threads 10 -m 2G -O BAM > vg_output/HG002_eval.aligned.sorted.renamed.bam
 
 #samtools index -@$(nproc) vg_output/HG002_eval.aligned.sorted.renamed.bam
 
 
 
 #Rerun vg haplotypes with --num-haplotypes 16 to make a separate GBZ just for DeepVariant
-# /private/home/yzybina/vg_1.74.1/vg haplotypes -v 2 -t 16 \
-#     --include-reference \
-#     --num-haplotypes 16 \
-#     -i /private/groups/cgl/hprc-graphs/hprc-v2.1-dec23/hprc-v2.1-mc-grch38-eval/hprc-v2.1-mc-grch38-eval.hapl \
-#     -k vg_output/HG002.kff \
-#     -g vg_output/HG002.16hap.gbz \
-#     /private/groups/cgl/hprc-graphs/hprc-v2.1-dec23/hprc-v2.1-mc-grch38-eval/hprc-v2.1-mc-grch38-eval.gbz
+/private/home/yzybina/vg_1.74.1/vg haplotypes -v 2 -t 16 \
+    --include-reference \
+    --num-haplotypes 16 \
+    -i /private/groups/cgl/hprc-graphs/hprc-v2.1-dec23/hprc-v2.1-mc-grch38-eval/hprc-v2.1-mc-grch38-eval.hapl \
+    -k vg_output/HG002.kff \
+    -g vg_output/HG002.16hap.gbz \
+    /private/groups/cgl/hprc-graphs/hprc-v2.1-dec23/hprc-v2.1-mc-grch38-eval/hprc-v2.1-mc-grch38-eval.gbz
 
 # then back - convert the graph
-#/private/home/yzybina/vg/bin/vg gbwt --gbz-v1 -Z vg_output/HG002.16hap.gbz -g vg_output/HG002.16hap.v1.gbz
+/private/home/yzybina/vg_1.74.1/vg gbwt --gbz-v1 -Z vg_output/HG002.16hap.gbz -g vg_output/HG002.16hap.v1.gbz
 
 BIN_VERSION="pangenome_aware_deepvariant-1.10.0"
 
